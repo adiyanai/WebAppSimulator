@@ -6,7 +6,48 @@
 
 }
 
-<body 
-      background="~/map.png" style="background-size:100% 100%; background-attachment:fixed">
-      <circle r="100" stroke="blue" stroke-width="3" fill="red" />
+<!DOCTYPE html>
+<html>
+<body>
+    <canvas id="myCanvas" width="1800" height="900" style="border:1px solid #d3d3d3;"></canvas>
+    <img src="~/map.png" id="myMap" width="0" height="0" />
+    <script>
+        window.onload = function () {
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            var img = document.getElementById("myMap");
+            var lon = (parseFloat(@Session["LONGITUDE"]) + 180) * 5;
+            var lat = (parseFloat(@Session["LATITUDE"]) + 90) * 5;
+            alert(lon);
+            alert(lat);
+            ctx.drawImage(img, 0, 0, 1800, 900);
+            ctx.fillStyle = "#ff2626"; // Red color
+            ctx.arc(lon, lat, 10, 0, Math.PI * 2, true);
+            ctx.fill();
+
+        }
+    </script>
 </body>
+</html>
+
+
+<html>
+<body>
+    <canvas id="myCanvas" width="1500" height="670" style="border:1px solid #d3d3d3;"></canvas>
+    <img src="~/map.png" id="myMap" width="0" height="0" />
+    <script>
+        window.onload = function () {
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            var img = document.getElementById("myMap");
+            var lon = 100;
+            var lat = 100;
+
+            ctx.drawImage(img, 0, 0, 1500, 700);
+            ctx.fillStyle = "#ff2626"; // Red color
+            ctx.arc(lon, lat, 10, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+    </script>
+</body>
+</html>
