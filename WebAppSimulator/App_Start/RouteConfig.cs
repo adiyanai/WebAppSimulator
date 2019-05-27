@@ -17,10 +17,10 @@ namespace WebAppSimulator
             routes.MapRoute("display", "display/{ip}/{port}",
             defaults: new { controller = "First", action = "display" });
 
-            routes.MapRoute("display", "display/{ip}/{port}/{times_per_second}",
+            routes.MapRoute("display2", "display/{ip}/{port}/{times_per_second}",
             defaults: new { controller = "First", action = "display" });
 
-            routes.MapRoute("save", "display/{ip}/{port}/{times_per_second}/{seconds}/{file_name}",
+            routes.MapRoute("save", "save/{ip}/{port}/{times_per_second}/{seconds}/{file_name}",
             defaults: new { controller = "First", action = "save" });
 
 
