@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-//using WebAppSimulator.Models;
+using WebAppSimulator.Models;
 
 namespace WebAppSimulator.Controllers
 
@@ -18,7 +18,7 @@ namespace WebAppSimulator.Controllers
             return View();
         }
 
-        /*[HttpGet]
+        [HttpGet]
         public ActionResult display(string ip, int port)
         {
             InfoModel.Instance.ip = ip;
@@ -26,7 +26,7 @@ namespace WebAppSimulator.Controllers
 
             //InfoModel.Instance.ReadData(ip, port);
             return View();
-        }*/
+        }
 
     }
 }
