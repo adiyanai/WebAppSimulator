@@ -28,5 +28,21 @@ namespace WebAppSimulator.Controllers
             return View();
         }
 
+        [HttpGet]
+        public ActionResult display(string ip, int port, int times_per_second)
+        {
+            InfoModel.Instance.ip = ip;
+            InfoModel.Instance.port = port.ToString();
+
+            //InfoModel.Instance.ReadData(ip, port);
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult save(string ip, int port, int times_per_second, int seconds, string file_name)
+        {
+            return View();
+        }
+
     }
 }
