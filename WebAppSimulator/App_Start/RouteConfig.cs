@@ -15,7 +15,7 @@ namespace WebAppSimulator
 
 
             routes.MapRoute("display", "display/{ip}/{port}",
-            defaults: new { controller = "First", action = "display" });
+            defaults: new { controller = "First", action = "display"});
 
             /*routes.MapRoute("display2", "display/{ip}/{port}/{times_per_second}",
             defaults: new { controller = "First", action = "display" });*/

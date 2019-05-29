@@ -1,0 +1,47 @@
+commit 9b63ec072fcba33bd5821d07bfda64d0bb42fd5f
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 19:40:50 2019 +0300
+
+    Update views
+
+commit d28d78c872989ba4de8ea09048db6f67076ea8fb
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 18:01:37 2019 +0300
+
+    Update display view
+
+commit 136b8cc7e854753354a407382f43f8f38449c040
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 17:33:50 2019 +0300
+
+    Update routes
+
+commit d87ab060e7975a32cfd4b2f9eda02a1c2d7ee66b
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 16:27:10 2019 +0300
+
+    Add routes and actions declaration
+
+commit a96d9ce4083395f0155af909bea2c4ba1268ef5b
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 14:32:08 2019 +0300
+
+    Show map :)
+
+commit b362e4750050aa6d3bdc2045d3334629dd68377d
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Mon May 27 14:08:52 2019 +0300
+
+    Show map
+
+commit 4fa4544498d3b5bed5a8a180bd956006ee197d48
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Sun May 26 13:15:52 2019 +0300
+
+    Add project files.
+
+commit 14297a49959f8fe3571d6bb9b12020cbee1ba58f
+Author: adiyanai <adiyanai10@gmail.com>
+Date:   Sun May 26 13:15:50 2019 +0300
+
+    Add .gitignore and .gitattributes.

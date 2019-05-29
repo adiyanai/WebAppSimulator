@@ -21,21 +21,23 @@ namespace WebAppSimulator.Controllers
         [HttpGet]
         public ActionResult display(string ip, int port)
         {
-            InfoModel.Instance.ip = ip;
-            InfoModel.Instance.port = port.ToString();
 
-            //InfoModel.Instance.ReadData(ip, port);
+            CommandModel.Instance.Connect(ip, port);
+            ViewBag.Lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
+            ViewBag.Lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
+            //CommandModel.Instance.Close();
             return View();
         }
 
         /*[HttpGet]
-        public ActionResult display(string ip, int port, int times_per_second)
+        public ActionResult display(string ip, int port,   int times_per_second)
         {
-            InfoModel.Instance.ip = ip;
-            InfoModel.Instance.port = port.ToString();
-
-            //InfoModel.Instance.ReadData(ip, port);
-            return View();
+            CommandModel.Instance.Connect(ip, port);
+            while(true)
+            {
+                //display(ip, port);
+                System.Threading.Thread.Sleep(times_per_second * 1000);
+            }
         }*/
 
         [HttpGet]

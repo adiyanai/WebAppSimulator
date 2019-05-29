@@ -101,9 +101,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ApplicationSettingsModel.cs" />
-    <Compile Include="Models\InfoModel.cs" />
-    <Compile Include="Models\ISettingsModel.cs" />
-    <Compile Include="Models\Server.cs" />
+    <Compile Include="Models\Client.cs" />
+    <Compile Include="Models\CommandModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
