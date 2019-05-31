@@ -19,27 +19,68 @@ namespace WebAppSimulator.Controllers
             return View();
         }
 
-        [HttpGet]
-        public ActionResult display(string ip, int port)
+        public bool CheckIp(string ip)
         {
+            bool is_ip = true;
+            string[] split_ip = ip.Split('.');
+            if (split_ip.Length != 4)
+            {
+                is_ip = false;
+            }
+            else
+            {
+                int n;
+                for (int i = 0; i < split_ip.Length; i++)
+                {
+                    if (!int.TryParse(split_ip[i], out n))
+                    {
+                        is_ip = false;
+                        break;
+                    }
+                }
+            }
 
-            CommandModel.Instance.Connect(ip, port);
-            ViewBag.Lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
-            ViewBag.Lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
-            CommandModel.Instance.Close();
+            return is_ip;
+        }
+
+        [HttpGet]
+        public ActionResult display(string ip, int port, int times_per_second = -1)
+        {
+            bool is_ip = CheckIp(ip);
+            if (is_ip)
+            {
+                if (times_per_second == -1)
+                {
+                    CommandModel.Instance.Connect(ip, port);
+                    ViewBag.Lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
+                    ViewBag.Lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
+                    CommandModel.Instance.Close();
+                }
+                else
+                {
+                    // todo- the other function display
+                }
+  
+            } else
+            {
+                string path, line, file_name;
+                file_name = ip;
+                path = AppDomain.CurrentDomain.BaseDirectory + @"\" + file_name + ".txt";
+
+                System.IO.StreamReader file = new System.IO.StreamReader(path);
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] split_info = line.Split(',');
+                    ViewBag.Lon = Convert.ToDouble(split_info[0]);
+                    ViewBag.Lat = Convert.ToDouble(split_info[1]);
+                }
+
+                file.Close();
+                return View("read");
+            }
             return View();
         }
 
-        /*[HttpGet]
-        public ActionResult display(string ip, int port, int times_per_second)
-        {
-            CommandModel.Instance.Connect(ip, port);
-            while(true)
-            {
-                //display(ip, port);
-                System.Threading.Thread.Sleep(times_per_second * 1000);
-            }
-        }*/
 
         // save to file the data in this format: (position) lon, lat, rudder, speed
         public void WriteToFile(string file_name, string info)
@@ -84,7 +125,7 @@ namespace WebAppSimulator.Controllers
 
         // todo - check how to check if the string is ip, and than to merge this function with the first one
         // time_per_second!!!
-        [HttpGet]
+        /*[HttpGet]
         public ActionResult read(string file_name, int times_per_second)
         {
             string path, line;
@@ -100,6 +141,6 @@ namespace WebAppSimulator.Controllers
 
             file.Close();
             return View();
-        }
+        }*/
     }
 }
