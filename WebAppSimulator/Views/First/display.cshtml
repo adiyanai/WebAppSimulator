@@ -1,52 +1,33 @@
 ﻿@{
 
     ViewBag.Title = "display";
-
     Layout = "~/Views/Shared/_Layout.cshtml";
 
 }
+
 <!DOCTYPE html>
-<!--
 <html>
-<body>
-    <canvas id="myCanvas" width="1800" height="900" style="border:1px solid #d3d3d3;"></canvas>
-    <img src="~/map.png" id="myMap" width="0" height="0" />
+<body background="~/map.png" style="background-size:100% 100%; background-attachment:fixed">
+    <canvas id="myCanvas" style="background-size:100% 100%; top:0; left:0; margin:0"></canvas>
     <script>
         window.onload = function () {
             var c = document.getElementById("myCanvas");
+            c.width = window.innerWidth;
+            c.height = window.innerHeight;
+            c.style.position = "absolute";
             var ctx = c.getContext("2d");
-            var img = document.getElementById("myMap");
-            var lon = (parseFloat(@Session["LONGITUDE"]) + 180) * 5;
-            var lat = (parseFloat(@Session["LATITUDE"]) + 90) * 5;
-            alert(lon);
-            alert(lat);
-            ctx.drawImage(img, 0, 0, 1800, 900);
-            ctx.fillStyle = "#ff2626"; // Red color
-            ctx.arc(lon, lat, 10, 0, Math.PI * 2, true);
-            ctx.fill();
-
-        }
-    </script>
-</body>
-</html>
-    -->
-
-<html>
-<body>
-    <canvas id="myCanvas" width="1240" height="580" style="border:1px solid #d3d3d3;"></canvas>
-    <img src="~/map.png" id="myMap" width="360" height="180" />
-    <script>
-        window.onload = function () {
-            var c = document.getElementById("myCanvas");
-            var ctx = c.getContext("2d");
-            var img = document.getElementById("myMap");
             var lon = @ViewBag.Lon;
             var lat = @ViewBag.Lat;
-
-            ctx.drawImage(img, 0, 0, 1240, 580);
-            ctx.fillStyle = "#ff2626"; // Red color
-            ctx.arc(lon, lat, 10, 0, Math.PI * 2, true);
+            var normalizedLon = ((lon + 180) * (c.width / 360));
+            var normalizedLat = ((lat + 90) * (c.height / 180));
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.arc(normalizedLon, normalizedLat, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "Red";
             ctx.fill();
+            ctx.strokeStyle = "Blue";
+            ctx.stroke();
+            ctx.closePath();
         }
     </script>
 </body>

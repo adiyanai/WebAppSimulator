@@ -26,7 +26,7 @@ namespace WebAppSimulator.Controllers
             CommandModel.Instance.Connect(ip, port);
             ViewBag.Lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
             ViewBag.Lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
-            //CommandModel.Instance.Close();
+            CommandModel.Instance.Close();
             return View();
         }
 
@@ -86,7 +86,7 @@ namespace WebAppSimulator.Controllers
 
         // todo - check how to check if the string is ip, and than to merge this function with the first one
         // time_per_second!!!
-        [HttpGet]
+        /*[HttpGet]
         public ActionResult Display(string file_name, int times_per_second)
         {
             string path, line;
@@ -103,6 +103,6 @@ namespace WebAppSimulator.Controllers
             file.Close();
             //CommandModel.Instance.Close();
             return View();
-        }
+        }*/
     }
 }
