@@ -48,10 +48,8 @@ namespace WebAppSimulator.Controllers
             // if the file doesn't exist, create the file and write the info to the file
             if (!(System.IO.File.Exists(path)))
             {
-                System.IO.File.Create(path);
-                TextWriter tw = new StreamWriter(path);
-                tw.WriteLine(info);
-                tw.Close();
+                info += "\r\n";
+                System.IO.File.WriteAllText(path, info);
             }
             // if the file already exist, write the info to the file
             else
@@ -86,8 +84,8 @@ namespace WebAppSimulator.Controllers
 
         // todo - check how to check if the string is ip, and than to merge this function with the first one
         // time_per_second!!!
-        /*[HttpGet]
-        public ActionResult Display(string file_name, int times_per_second)
+        [HttpGet]
+        public ActionResult read(string file_name, int times_per_second)
         {
             string path, line;
             path = AppDomain.CurrentDomain.BaseDirectory + @"\" + file_name + ".txt";
@@ -101,8 +99,7 @@ namespace WebAppSimulator.Controllers
             }
 
             file.Close();
-            //CommandModel.Instance.Close();
             return View();
-        }*/
+        }
     }
 }
