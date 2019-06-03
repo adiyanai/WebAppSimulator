@@ -59,9 +59,9 @@ namespace WebAppSimulator.Controllers
         public ActionResult GetLonLat()
         {
             double rudder, throttle, lon, lat;
-            //Random rnd = new Random();
-            lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n"); //rnd.Next(1, 50);
-            lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n"); //rnd.Next(1, 50);
+
+            lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
+            lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
             rudder = CommandModel.Instance.GetData("get controls/flight/rudder \r\n");
             throttle = CommandModel.Instance.GetData("get /controls/engines/current-engine/throttle \r\n");
 
