@@ -20,9 +20,6 @@ namespace WebAppSimulator
             routes.MapRoute("save", "save/{ip}/{port}/{times_per_second}/{seconds}/{file_name}",
             defaults: new { controller = "First", action = "save" });
 
-            /*routes.MapRoute("read", "read/{file_name}/{times_per_second}",
-            defaults: new { controller = "First", action = "read" });*/
-
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

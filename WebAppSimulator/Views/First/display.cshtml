@@ -1,33 +1,203 @@
 ﻿@{
 
     ViewBag.Title = "display";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 
 }
 
 <!DOCTYPE html>
 <html>
-<body background="~/map.png" style="background-size:100% 100%; background-attachment:fixed">
-    <canvas id="myCanvas" style="background-size:100% 100%; top:0; left:0; margin:0"></canvas>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <input id="drawPath" type="hidden" value="@ViewBag.drawPath"/>
+    <input id="samplingRate" type="hidden" value="@ViewBag.samplingRate"/>
+    <input id="mode" type="hidden" value="@ViewBag.mode"/>
+    <input id="fileName" type="hidden" value="@ViewBag.fileName" />
+    <input id="seconds" type="hidden" value="@ViewBag.seconds" />
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
     <script>
-        window.onload = function () {
-            var c = document.getElementById("myCanvas");
-            c.width = window.innerWidth;
-            c.height = window.innerHeight;
-            c.style.position = "absolute";
-            var ctx = c.getContext("2d");
-            var lon = @ViewBag.Lon;
-            var lat = @ViewBag.Lat;
-            var normalizedLon = ((lon + 180) * (c.width / 360));
-            var normalizedLat = ((lat + 90) * (c.height / 180));
+
+        drawPoint = function (ctx, x, y) {
+            var normalizedX = ((x + 180) * (window.innerWidth / 360));
+            var normalizedY = ((y + 90) * (window.innerHeight / 180));
+
             ctx.beginPath();
             ctx.lineWidth = 2;
-            ctx.arc(normalizedLon, normalizedLat, 4, 0, Math.PI * 2);
+            ctx.arc(normalizedX, normalizedY, 4, 0, Math.PI * 2);
             ctx.fillStyle = "Red";
             ctx.fill();
             ctx.strokeStyle = "Blue";
             ctx.stroke();
             ctx.closePath();
+        }
+
+        drawOnlyPoint = function () {
+
+            var windowWidth = window.innerWidth;
+            var windowHeight = window.innerHeight;
+
+            var canvas = document.getElementById("myCanvas");
+            var ctx = canvas.getContext("2d");
+
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+
+
+            var background = new Image();
+            background.src = "/Content/Images/map.png";
+
+            background.onload = function () {
+                ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height);
+
+                $.get("/First/GetLonLat", function (data) {
+                    drawPoint(ctx, data.Lon, data.Lat);
+                });
+            }
+
+        }
+
+        drawAllPath = function () {
+            var samplingRate = $("#samplingRate").val();
+            var samplingRateValue = 0;
+            var fileName = "";
+            var seconds = 0;
+            
+            if ($("#mode").val() == "simulator") {
+                samplingRateValue = samplingRate * 1000;
+            } else if ($("#mode").val() == "readFromFile") {
+                fileName = $("#fileName").val();
+            } else if ($("#mode").val() == "saveToFile") {
+                samplingRateValue = 1000 / samplingRate;
+                seconds = $("#seconds").val();
+                fileName = $("#fileName").val();
+            }
+            
+            var path = new Array;
+            var updateInfoID;
+
+            var windowWidth = window.innerWidth;
+            var windowHeight = window.innerHeight;
+
+            var canvas = document.getElementById("myCanvas");
+            var ctx = canvas.getContext("2d");
+
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+
+            var background = new Image();
+            background.src = "/Content/Images/map.png";
+
+
+            background.onload = function () {
+
+                var updateInfo = function () {
+                    
+                    if ($("#mode").val() == "simulator" || $("#mode").val() == "saveToFile") {
+                        
+                        $.get("/First/GetLonLat", function (data) {
+                            
+                            if (path.length == 0 || (path[path.length - 1].Lon != data.Lon && path[path.length - 1].Lat != data.Lat)) {
+                                path.push(data);
+                            }
+                            drawPoint(ctx, data.Lon, data.Lat);
+                            // read info with breaks
+                            updateInfoID = setTimeout(updateInfo, samplingRateValue);
+                        });
+
+                    } else if ($("#mode").val() == "readFromFile") {
+                        $.get("/First/ReadFromFile", { "file_name": fileName }, function (data) {
+                            console.info(data);
+                            dataAsJson = JSON.parse(data);
+
+                            var index = 0;
+                            updateFromFile = function () {
+                                path.push(dataAsJson[index]);
+                                index++;
+                                // if we doesnt finish to read from the file
+                                if (index < dataAsJson.length) {
+                                    // read info with breaks
+                                    setTimeout(updateFromFile, 1000 / samplingRate);
+                                }
+                                // no more data to read
+                                else {
+                                    setTimeout(
+                                        function () {
+                                            alert("done!");
+                                        }, 1000);
+                                }
+                            }
+
+                            updateFromFile();
+                        });
+                    }
+                }
+
+                updateInfo();
+
+                var drawInfo = function () {
+                    //draw background image
+                    ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height); // destination rectangle
+
+                    if (path.length == 1) {
+                        drawPoint(ctx, path[0].Lon, path[0].Lat);
+                    } else if (path.length != 0) {
+                        var normalizedLon = ((path[0].Lon + 180) * (window.innerWidth / 360));
+                        var normalizedLat = ((path[0].Lat + 90) * (window.innerHeight / 180));
+
+                        ctx.beginPath();
+                        ctx.lineWidth = "1";
+                        ctx.strokeStyle = "red";
+                        ctx.moveTo(normalizedLon, normalizedLat);
+
+                        for (var i = 1; i < path.length; i++) {
+                            normalizedLon = ((path[i].Lon + 180) * (window.innerWidth / 360));
+                            normalizedLat = ((path[i].Lat + 90) * (window.innerHeight / 180));
+                            ctx.lineTo(normalizedLon, normalizedLat);
+                        }
+                        ctx.stroke();
+                        drawPoint(ctx, path[path.length - 1].Lon, path[path.length - 1].Lat);
+                    }
+
+                    //rerender samplingRate times in sec
+                    setTimeout(drawInfo, 1000 / samplingRate);
+                }
+
+                drawInfo();
+
+                var saveToFile = function () {
+                    // stop the animation
+                    if (updateInfoID != undefined && updateInfoID != null) {
+                        clearTimeout(updateInfoID);
+                    }
+
+                    // save the flight info to the file
+                    var data = { "file_name": fileName, "info": JSON.stringify(path) }
+                    console.info(data);
+
+                    $.ajax({
+                        type: "POST",
+                        traditional: true,
+                        url: "/First/WriteToFile",
+                        content: "application/json;",
+                        dataType: "json",
+                        data: data,
+                        success: function () {
+                            console.info("saved successfuly");
+                        }
+                    });
+                }
+
+                // if we need to save to file
+                // run the animation the number of seconds that required and than stop the animation and save the flight info to the file
+                if ($("#mode").val() == "saveToFile") {
+                    setTimeout(saveToFile, seconds * 1000);
+                }
+            }
+        }
+
+        if ($("#drawPath").val() == false) {
+            drawOnlyPoint();
+        } else {
+            drawAllPath();
         }
     </script>
 </body>

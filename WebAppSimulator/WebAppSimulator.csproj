@@ -89,9 +89,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\map.png" />
+    <Content Include="Content\Images\map.png" />
     <Content Include="Global.asax" />
-    <Content Include="map.png" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +103,7 @@
     <Compile Include="Models\ApplicationSettingsModel.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\CommandModel.cs" />
+    <Compile Include="Models\FlightData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -111,8 +112,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\First\Index.cshtml" />
     <Content Include="Views\First\display.cshtml" />
-    <Content Include="Views\First\save.cshtml" />
-    <Content Include="Views\First\read.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -120,7 +120,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using WebAppSimulator.Models;
+using System.Net;
 
 namespace WebAppSimulator.Controllers
 
@@ -19,128 +20,104 @@ namespace WebAppSimulator.Controllers
             return View();
         }
 
-        public bool CheckIp(string ip)
-        {
-            bool is_ip = true;
-            string[] split_ip = ip.Split('.');
-            if (split_ip.Length != 4)
-            {
-                is_ip = false;
-            }
-            else
-            {
-                int n;
-                for (int i = 0; i < split_ip.Length; i++)
-                {
-                    if (!int.TryParse(split_ip[i], out n))
-                    {
-                        is_ip = false;
-                        break;
-                    }
-                }
-            }
-
-            return is_ip;
-        }
 
         [HttpGet]
         public ActionResult display(string ip, int port, int times_per_second = -1)
         {
-            bool is_ip = CheckIp(ip);
+            IPAddress ipAddress;
+            bool is_ip = IPAddress.TryParse(ip, out ipAddress);
+
+            // close the last connection
+            CommandModel.Instance.Close();
+
             if (is_ip)
             {
+                // connect again
+                CommandModel.Instance.Connect(ip, port);
                 if (times_per_second == -1)
                 {
-                    CommandModel.Instance.Connect(ip, port);
-                    ViewBag.Lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
-                    ViewBag.Lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
-                    CommandModel.Instance.Close();
+                    ViewBag.drawPath = false;
                 }
                 else
                 {
-                    // todo- the other function display
+                    ViewBag.drawPath = true;
                 }
-  
-            } else
+                ViewBag.samplingRate = times_per_second;
+                ViewBag.mode = "simulator";
+            }
+            else
             {
-                string path, line, file_name;
-                file_name = ip;
-                path = AppDomain.CurrentDomain.BaseDirectory + @"\" + file_name + ".txt";
-
-                System.IO.StreamReader file = new System.IO.StreamReader(path);
-                while ((line = file.ReadLine()) != null)
-                {
-                    string[] split_info = line.Split(',');
-                    ViewBag.Lon = Convert.ToDouble(split_info[0]);
-                    ViewBag.Lat = Convert.ToDouble(split_info[1]);
-                }
-
-                file.Close();
-                return View("read");
+                ViewBag.drawPath = true;
+                ViewBag.fileName = ip;
+                ViewBag.samplingRate = port;
+                ViewBag.mode = "readFromFile";
             }
             return View();
         }
 
-
-        // save to file the data in this format: (position) lon, lat, rudder, speed
-        public void WriteToFile(string file_name, string info)
+        [HttpGet]
+        public ActionResult GetLonLat()
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + @"\" + file_name + ".txt";
-            // if the file doesn't exist, create the file and write the info to the file
-            if (!(System.IO.File.Exists(path)))
+            double rudder, throttle, lon, lat;
+            Random rnd = new Random();
+            lon = rnd.Next(1, 50); //CommandModel.Instance.GetData("get position/longitude-deg \r\n");
+            lat = rnd.Next(1, 50); //CommandModel.Instance.GetData("get position/latitude-deg \r\n");
+            rudder = CommandModel.Instance.GetData("get controls/flight/rudder \r\n");
+            throttle = CommandModel.Instance.GetData("get /controls/engines/current-engine/throttle \r\n");
+
+            FlightData info = new FlightData
             {
-                info += "\r\n";
-                System.IO.File.WriteAllText(path, info);
-            }
-            // if the file already exist, write the info to the file
-            else
-            {
-                using (var tw = new StreamWriter(path, true))
-                {
-                    tw.WriteLine(info);
-                    tw.Close();
-                }
-            }
+                Lon = lon,
+                Lat = lat,
+                Rudder = rudder,
+                Throttle = throttle
+            };
+
+            return Json(info, JsonRequestBehavior.AllowGet);
         }
 
-        // todo - time_per_second!!!
+
+        [HttpPost]
+        // save to file the data in this format: (position) lon, lat, rudder, speed
+        public ActionResult WriteToFile(string file_name, string info)
+        {
+            string path = "~/" + file_name + ".json";
+
+            using (StreamWriter writer = new StreamWriter(Server.MapPath(path), false))
+            {
+                writer.WriteLine(info);
+            }
+
+            return Json(HttpStatusCode.OK);
+        }
+
+
         [HttpGet]
         public ActionResult save(string ip, int port, int times_per_second, int seconds, string file_name)
         {
+            // close the last connection
+            CommandModel.Instance.Close();
+            // connect again
             CommandModel.Instance.Connect(ip, port);
-            double lon, lat, rudder, speed;
-            lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
-            lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
-            rudder = CommandModel.Instance.GetData("get controls/flight/rudder \r\n");
-            speed = CommandModel.Instance.GetData("get instrumentation/airspeed-indicator/indicated-speed-kt \r\n");
-            ViewBag.Lon = lon;
-            ViewBag.Lat = lat;
-            
-            // string info format: (position) lon, lat, rudder, speed
-            string info = lon.ToString() + "," + lat.ToString() + "," + rudder.ToString() + "," + speed.ToString();
-            WriteToFile(file_name, info);
+            ViewBag.drawPath = true;
+            ViewBag.mode = "saveToFile";
+            ViewBag.samplingRate = times_per_second;
+            ViewBag.seconds = seconds;
+            ViewBag.fileName = file_name;
 
-            return View();
+            return View("display");
         }
 
-        // todo - check how to check if the string is ip, and than to merge this function with the first one
-        // time_per_second!!!
-        /*[HttpGet]
-        public ActionResult read(string file_name, int times_per_second)
+
+        [HttpGet]
+        public ActionResult ReadFromFile(string file_name)
         {
-            string path, line;
-            path = AppDomain.CurrentDomain.BaseDirectory + @"\" + file_name + ".txt";
+            string path = "~/" + file_name + ".json";
 
-            System.IO.StreamReader file = new System.IO.StreamReader(path);
-            while ((line = file.ReadLine()) != null)
+            using (StreamReader reader = new StreamReader(Server.MapPath(path), true))
             {
-                string[] split_info = line.Split(',');
-                ViewBag.Lon = Convert.ToDouble(split_info[0]);
-                ViewBag.Lat = Convert.ToDouble(split_info[1]);
+                return Json(reader.ReadToEnd(), JsonRequestBehavior.AllowGet);
             }
-
-            file.Close();
-            return View();
-        }*/
+        }
     }
 }
