@@ -135,7 +135,7 @@
 
                 var drawInfo = function () {
                     //draw background image
-                    ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height); // destination rectangle
+                    ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height);
 
                     if (path.length == 1) {
                         drawPoint(ctx, path[0].Lon, path[0].Lat);
@@ -157,8 +157,8 @@
                         drawPoint(ctx, path[path.length - 1].Lon, path[path.length - 1].Lat);
                     }
 
-                    //rerender samplingRate times in sec
-                    setTimeout(drawInfo, 1000 / samplingRate);
+                    //rerender 4 times in sec
+                    setTimeout(drawInfo, 1000 / 4);
                 }
 
                 drawInfo();
