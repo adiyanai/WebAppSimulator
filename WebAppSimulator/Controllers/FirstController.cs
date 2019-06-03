@@ -30,14 +30,17 @@ namespace WebAppSimulator.Controllers
             // close the last connection
             CommandModel.Instance.Close();
 
+            // if there is ip, connect
             if (is_ip)
             {
                 // connect again
                 CommandModel.Instance.Connect(ip, port);
+                // draw only point
                 if (times_per_second == -1)
                 {
                     ViewBag.drawPath = false;
                 }
+                // draw the airplane path
                 else
                 {
                     ViewBag.drawPath = true;
@@ -45,6 +48,7 @@ namespace WebAppSimulator.Controllers
                 ViewBag.samplingRate = times_per_second;
                 ViewBag.mode = "simulator";
             }
+            // if there is no ip, read from file
             else
             {
                 ViewBag.drawPath = true;
@@ -59,7 +63,7 @@ namespace WebAppSimulator.Controllers
         public ActionResult GetLonLat()
         {
             double rudder, throttle, lon, lat;
-
+            // get the required info
             lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
             lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
             rudder = CommandModel.Instance.GetData("get controls/flight/rudder \r\n");
@@ -78,11 +82,11 @@ namespace WebAppSimulator.Controllers
 
 
         [HttpPost]
-        // save to file the data in this format: (position) lon, lat, rudder, speed
         public ActionResult WriteToFile(string file_name, string info)
         {
             string path = "~/" + file_name + ".json";
 
+            // save the data to the file
             using (StreamWriter writer = new StreamWriter(Server.MapPath(path), false))
             {
                 writer.WriteLine(info);
@@ -113,7 +117,7 @@ namespace WebAppSimulator.Controllers
         public ActionResult ReadFromFile(string file_name)
         {
             string path = "~/" + file_name + ".json";
-
+            // read the info from the file
             using (StreamReader reader = new StreamReader(Server.MapPath(path), true))
             {
                 return Json(reader.ReadToEnd(), JsonRequestBehavior.AllowGet);

@@ -13,7 +13,6 @@ namespace WebAppSimulator
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-
             routes.MapRoute("display", "display/{ip}/{port}/{times_per_second}",
             defaults: new { controller = "First", action = "display", times_per_second = UrlParameter.Optional});
 

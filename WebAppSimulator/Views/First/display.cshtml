@@ -16,7 +16,9 @@
     <script src="~/Scripts/jquery-1.10.2.js"></script>
     <script>
 
+        // draw the point
         drawPoint = function (ctx, x, y) {
+            // normalize x and y
             var normalizedX = ((x + 180) * (window.innerWidth / 360));
             var normalizedY = ((y + 90) * (window.innerHeight / 180));
 
@@ -30,6 +32,7 @@
             ctx.closePath();
         }
 
+        // draw only point
         drawOnlyPoint = function () {
 
             var windowWidth = window.innerWidth;
@@ -46,6 +49,7 @@
             background.src = "/Content/Images/map.png";
 
             background.onload = function () {
+                //draw background image
                 ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height);
 
                 $.get("/First/GetLonLat", function (data) {
@@ -55,22 +59,21 @@
 
         }
 
+        // draw the path
         drawAllPath = function () {
             var samplingRate = $("#samplingRate").val();
-            var samplingRateValue = 0;
+            var samplingRateValue = samplingRate * 1000;
             var fileName = "";
             var seconds = 0;
             
-            if ($("#mode").val() == "simulator") {
-                samplingRateValue = samplingRate * 1000;
-            } else if ($("#mode").val() == "readFromFile") {
+            if ($("#mode").val() == "readFromFile") {
                 fileName = $("#fileName").val();
             } else if ($("#mode").val() == "saveToFile") {
-                samplingRateValue = 1000 / samplingRate;
                 seconds = $("#seconds").val();
                 fileName = $("#fileName").val();
             }
-            
+
+            // create array for the path
             var path = new Array;
             var updateInfoID;
 
@@ -90,38 +93,41 @@
             background.onload = function () {
 
                 var updateInfo = function () {
-                    
+
+                    // get the information from the simulator
                     if ($("#mode").val() == "simulator" || $("#mode").val() == "saveToFile") {
                         
                         $.get("/First/GetLonLat", function (data) {
                             
                             if (path.length == 0 || (path[path.length - 1].Lon != data.Lon && path[path.length - 1].Lat != data.Lat)) {
+                                // add new data to the path
                                 path.push(data);
                             }
                             drawPoint(ctx, data.Lon, data.Lat);
                             // read info with breaks
                             updateInfoID = setTimeout(updateInfo, samplingRateValue);
                         });
-
-                    } else if ($("#mode").val() == "readFromFile") {
+                    }
+                    // get the information from the file
+                    else if ($("#mode").val() == "readFromFile") {
                         $.get("/First/ReadFromFile", { "file_name": fileName }, function (data) {
                             console.info(data);
                             dataAsJson = JSON.parse(data);
 
                             var index = 0;
                             updateFromFile = function () {
+                                // add new data to the path
                                 path.push(dataAsJson[index]);
                                 index++;
                                 // if we doesnt finish to read from the file
                                 if (index < dataAsJson.length) {
-                                    // read info with breaks
-                                    setTimeout(updateFromFile, 1000 / samplingRate);
+                                    setTimeout(updateFromFile, samplingRateValue);
                                 }
                                 // no more data to read
                                 else {
                                     setTimeout(
                                         function () {
-                                            alert("done!");
+                                            alert("done the animation!");
                                         }, 1000);
                                 }
                             }
@@ -133,13 +139,16 @@
 
                 updateInfo();
 
+                // draw the animation
                 var drawInfo = function () {
                     //draw background image
                     ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, canvas.height);
 
+                    // if there is just one point, draw only point
                     if (path.length == 1) {
                         drawPoint(ctx, path[0].Lon, path[0].Lat);
                     } else if (path.length != 0) {
+                        // normalize lon and lat
                         var normalizedLon = ((path[0].Lon + 180) * (window.innerWidth / 360));
                         var normalizedLat = ((path[0].Lat + 90) * (window.innerHeight / 180));
 
@@ -148,12 +157,14 @@
                         ctx.strokeStyle = "red";
                         ctx.moveTo(normalizedLon, normalizedLat);
 
+                        // draw the current path
                         for (var i = 1; i < path.length; i++) {
                             normalizedLon = ((path[i].Lon + 180) * (window.innerWidth / 360));
                             normalizedLat = ((path[i].Lat + 90) * (window.innerHeight / 180));
                             ctx.lineTo(normalizedLon, normalizedLat);
                         }
                         ctx.stroke();
+                        // draw the current airplan's position
                         drawPoint(ctx, path[path.length - 1].Lon, path[path.length - 1].Lat);
                     }
 
@@ -163,6 +174,7 @@
 
                 drawInfo();
 
+                // save the information to the file
                 var saveToFile = function () {
                     // stop the animation
                     if (updateInfoID != undefined && updateInfoID != null) {
