@@ -63,6 +63,7 @@ namespace WebAppSimulator.Controllers
         public ActionResult GetLonLat()
         {
             double rudder, throttle, lon, lat;
+
             // get the required info
             lon = CommandModel.Instance.GetData("get position/longitude-deg \r\n");
             lat = CommandModel.Instance.GetData("get position/latitude-deg \r\n");
